@@ -15,7 +15,6 @@ const signUP = async (req, res) => {
     name,
     email,
     password,
-    confirmPassword,
   });
   await newUser.save();
   res.json({ message: "User created successfully" });
