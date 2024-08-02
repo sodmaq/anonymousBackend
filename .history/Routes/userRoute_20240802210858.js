@@ -10,4 +10,5 @@ router.post(
   middleware.refreshTokenMiddleware,
   authController.handleRefreshToken
 );
+router.get("/getUser", middleware.protected, authController.getUser);
 module.exports = router;

@@ -10,4 +10,9 @@ router.post(
   middleware.refreshTokenMiddleware,
   authController.handleRefreshToken
 );
+router.get(
+  "/getUser",
+  middleware.refreshTokenMiddleware,
+  authController.getUser
+);
 module.exports = router;

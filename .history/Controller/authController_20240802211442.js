@@ -28,26 +28,27 @@ const signUP = async (req, res) => {
 
 //login endpoint
 const login = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-  const findUser = await User.findOne({ email }).select("+password");
-  if (
-    !findUser ||
-    !(await findUser.correctPassword(password, findUser.password))
-  ) {
-    return res.status(400).json({ message: "Incorrect Email or Password" });
-  }
-  const refreshToken = generateRefreshToken(findUser._id);
-  const expirationTime = calculateExpirationTime();
-  res.status(200).json({
-    user: findUser,
-    token: generateToken(findUser._id),
-    expiresIn: expirationTime,
-    refreshToken: refreshToken,
-  });
-});
+  async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const findUser = await User.findOne({ email }).select("+password");
+    if (
+      !findUser ||
+      !(await findUser.correctPassword(password, findUser.password))
+    ) {
+      return res.status(400).json({ message: "Incorrect Email or Password" });
+    }
+    const refreshToken = generateRefreshToken(findUser._id);
+    const expirationTime = calculateExpirationTime();
+    res.status(200).json({
+      user: findUser,
+      token: generateToken(findUser._id),
+      expiresIn: expirationTime,
+      refreshToken: refreshToken,
+    });
+})
 
 //Refresh token endpoint
 const handleRefreshToken = async (req, res) => {

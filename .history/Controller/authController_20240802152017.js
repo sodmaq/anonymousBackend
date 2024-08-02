@@ -2,9 +2,7 @@ const User = require("../Models/userModel");
 const { generateToken } = require("../config/jwtToken");
 const generateRefreshToken = require("../config/refreshToken");
 const { calculateExpirationTime } = require("../config/jwtToken");
-const asyncHandler = require("express-async-handler");
 
-// sign up endpoint
 const signUP = async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
   if (!name || !email || !password || !confirmPassword) {
@@ -26,8 +24,7 @@ const signUP = async (req, res) => {
   res.json({ message: "User created successfully", newUser });
 };
 
-//login endpoint
-const login = asyncHandler(async (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ message: "All fields are required" });
@@ -41,20 +38,19 @@ const login = asyncHandler(async (req, res) => {
   }
   const refreshToken = generateRefreshToken(findUser._id);
   const expirationTime = calculateExpirationTime();
+  const updateUser = await User.findByIdAndUpdate(
+    findUser._id,
+    {
+      refreshToken: refreshToken,
+    },
+    { new: true }
+  );
   res.status(200).json({
     user: findUser,
     token: generateToken(findUser._id),
     expiresIn: expirationTime,
     refreshToken: refreshToken,
   });
-});
-
-//Refresh token endpoint
-const handleRefreshToken = async (req, res) => {
-  const { user } = req;
-  const newToken = generateToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
-  res.status(200).json({ token: newToken, refreshToken: refreshToken });
 };
 
-module.exports = { signUP, login, handleRefreshToken };
+module.exports = { signUP };

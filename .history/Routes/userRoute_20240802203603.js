@@ -5,9 +5,5 @@ const middleware = require("../middlewares/authMiddleware");
 
 router.post("/signup", authController.signUP);
 router.post("/login", authController.login);
-router.post(
-  "/handleRefreshToken",
-  middleware.refreshTokenMiddleware,
-  authController.handleRefreshToken
-);
+router.post("/handleRefreshToken", authController.handleRefreshToken);
 module.exports = router;
