@@ -50,4 +50,5 @@ userSchema.methods.correctPassword = async function (
 ) {
   return await bycrypt.compare(candidatePassword, userPassword);
 };
+
 module.exports = mongoose.model("User", userSchema);

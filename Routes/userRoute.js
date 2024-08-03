@@ -10,4 +10,9 @@ router.post(
   middleware.refreshTokenMiddleware,
   authController.handleRefreshToken
 );
+router.post(
+  "/updatePassword",
+  middleware.protected,
+  authController.updatePassword
+);
 module.exports = router;

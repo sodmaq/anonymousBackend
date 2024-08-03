@@ -9,13 +9,16 @@ const AppError = require("../utils/appError");
 const signUP = catchAsync(async (req, res, next) => {
   const { name, email, password, confirmPassword } = req.body;
   if (!name || !email || !password || !confirmPassword) {
-    return res.status(400).json({ message: "All fields are required" });
+    return next(
+      new AppError(
+        "Please provide name, email, password and confirmPassword",
+        400
+      )
+    );
   }
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    return res
-      .status(409)
-      .json({ message: "User with the email already exists" });
+    return next(new AppError("User already exists", 400));
   }
   const newUser = new User({
     name,
@@ -56,5 +59,19 @@ const handleRefreshToken = async (req, res) => {
   const refreshToken = generateRefreshToken(user._id);
   res.status(200).json({ token: newToken, refreshToken: refreshToken });
 };
+const updatePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return next(new AppError("Please provide current and new passwords", 400));
+  }
+  const user = await User.findById(req.user._id).select("+password");
+  if (!(await user.correctPassword(currentPassword, user.password))) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
+  user.password = newPassword;
+  user.confirmPassword = newPassword;
+  await user.save();
+  res.status(200).json({ status: "success", message: "Password updated" });
+});
 
-module.exports = { signUP, login, handleRefreshToken };
+module.exports = { signUP, login, handleRefreshToken, updatePassword };
