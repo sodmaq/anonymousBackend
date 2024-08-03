@@ -3,7 +3,6 @@ const { generateToken } = require("../config/jwtToken");
 const generateRefreshToken = require("../config/refreshToken");
 const { calculateExpirationTime } = require("../config/jwtToken");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {

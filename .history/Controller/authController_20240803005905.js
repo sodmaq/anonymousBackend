@@ -3,10 +3,9 @@ const { generateToken } = require("../config/jwtToken");
 const generateRefreshToken = require("../config/refreshToken");
 const { calculateExpirationTime } = require("../config/jwtToken");
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/appError");
 
 // sign up endpoint
-const signUP = catchAsync(async (req, res, next) => {
+const signUP = catchAsync(async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
   if (!name || !email || !password || !confirmPassword) {
     return res.status(400).json({ message: "All fields are required" });
@@ -27,17 +26,17 @@ const signUP = catchAsync(async (req, res, next) => {
   res.json({ message: "User created successfully", newUser });
 });
 //login endpoint
-const login = catchAsync(async (req, res, next) => {
+const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return next(new AppError("Please provide email and password", 400));
+    return res.status(400).json({ message: "All fields are required" });
   }
   const findUser = await User.findOne({ email }).select("+password");
   if (
     !findUser ||
     !(await findUser.correctPassword(password, findUser.password))
   ) {
-    return next(new AppError("Incorrect email or password", 401));
+    return res.status(400).json({ message: "Incorrect Email or Password" });
   }
   const refreshToken = generateRefreshToken(findUser._id);
   const expirationTime = calculateExpirationTime();
