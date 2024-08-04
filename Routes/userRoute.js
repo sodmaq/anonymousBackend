@@ -16,5 +16,7 @@ router.post(
   authController.updatePassword
 );
 router.get("/verifyEmail/:token", authController.verifyEmail);
+router.post("/forgotPassword", authController.forgotPassword);
+router.patch("/resetPassword/:token", authController.resetPassword);
 
 module.exports = router;
