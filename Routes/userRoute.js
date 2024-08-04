@@ -15,4 +15,6 @@ router.post(
   middleware.protected,
   authController.updatePassword
 );
+router.get("/verifyEmail/:token", authController.verifyEmail);
+
 module.exports = router;

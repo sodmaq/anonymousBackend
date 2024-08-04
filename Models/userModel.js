@@ -31,15 +31,29 @@ const userSchema = new mongoose.Schema(
         message: "Passwords are not the same",
       },
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
 
+// Pre-save middleware to hash password if it is modified
 userSchema.pre("save", async function (next) {
+  // Only run this function if the password was actually modified
+  if (!this.isModified("password")) return next();
+  // Hash the password with cost of 10
   const salt = await bycrypt.genSalt(10);
   this.password = await bycrypt.hash(this.password, salt);
+
+  // Delete confirmPassword field
   this.confirmPassword = undefined;
   next();
 });
