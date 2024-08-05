@@ -45,5 +45,12 @@ const protected = catchAsync(async (req, res, next) => {
     throw new Error("there is no token attached to this head");
   }
 });
+const isAdmin = catchAsync(async (req, res, next) => {
+  if (req.user.role === "admin") {
+    next();
+  } else {
+    throw new Error("you are not admin");
+  }
+});
 
-module.exports = { refreshTokenMiddleware, protected };
+module.exports = { refreshTokenMiddleware, protected, isAdmin };

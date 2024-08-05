@@ -11,7 +11,7 @@ router.post(
   middleware.refreshTokenMiddleware,
   authController.handleRefreshToken
 );
-router.post(
+router.patch(
   "/updatePassword",
   middleware.protected,
   authController.updatePassword
@@ -21,7 +21,12 @@ router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
 router.get("/me", middleware.protected, userController.getUser);
-// router.get("/allUsers", middleware.admin, userController.getAllUsers);
+router.get(
+  "/allUsers",
+  middleware.protected,
+  middleware.isAdmin,
+  userController.getAllUsers
+);
 router.patch("/updateMe", middleware.protected, userController.updateUser);
 router.delete("/deleteMe/:id", middleware.protected, userController.deleteUser);
 

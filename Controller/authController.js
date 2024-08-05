@@ -11,10 +11,10 @@ const crypto = require("crypto");
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {
-  const { name, email, password, confirmPassword } = req.body;
+  const { name, email, password, confirmPassword, role } = req.body;
 
   // Validate input
-  if (!name || !email || !password || !confirmPassword) {
+  if (!name || !email || !password || !confirmPassword || !role) {
     return next(
       new AppError(
         "Please provide name, email, password, and confirmPassword",
@@ -34,6 +34,7 @@ const signUP = catchAsync(async (req, res, next) => {
     email,
     password,
     confirmPassword,
+    role,
   });
   await newUser.save();
   // create verification token
