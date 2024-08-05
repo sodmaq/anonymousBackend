@@ -10,6 +10,7 @@ async function createFakeUser() {
     email: faker.internet.email(),
     password: password,
     confirmPassword: password,
+    role: "user",
   };
 
   try {

@@ -27,7 +27,12 @@ router.get(
   middleware.isAdmin,
   userController.getAllUsers
 );
-router.patch("/updateMe", middleware.protected, userController.updateUser);
-router.delete("/deleteMe/:id", middleware.protected, userController.deleteUser);
-
+router.patch("/updateMe/:id", middleware.protected, userController.updateUser);
+router.delete("/deleteMe/:id", middleware.protected, userController.deleteMe);
+router.delete(
+  "/deleteUser/:id",
+  middleware.protected,
+  middleware.isAdmin,
+  userController.deleteUser
+);
 module.exports = router;

@@ -5,7 +5,7 @@ const sendEmail = require("../utils/email");
 const crypto = require("crypto");
 
 // get A user
-exports.getUser = catchAsync(async (req, res, next) => {
+const getUser = catchAsync(async (req, res, next) => {
   const user = req.user;
   if (!user) return next(new AppError("User not found", 404));
   res.status(200).json({
@@ -17,8 +17,8 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 // get all users
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+const getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find({ deleted: { $ne: true } });
   if (!users) return next(new AppError("No users found", 404));
   res.status(200).json({
     status: "success",
@@ -30,7 +30,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 // update user
-exports.updateUser = catchAsync(async (req, res, next) => {
+const updateUser = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.confirmPassword) {
     return next(
       new AppError(
@@ -52,17 +52,39 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   });
 });
 
-// delete user
-exports.deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findByIdAndDelete(req.params.id);
+// delete user for user
+const deleteMe = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
   if (!user) {
     return next(new AppError("User not found", 404));
   }
+  user.isActive = false;
+  await user.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",
-    message: "User deleted successfully",
+    message: "user deleted successfully",
     data: {
       user,
     },
   });
 });
+
+// delete user for admin
+const deleteUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+  user.deleted = true;
+  user.deletedAt = new Date();
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json({
+    status: "success",
+    message: "user deleted successfully",
+    data: {
+      user,
+    },
+  });
+});
+
+module.exports = { getUser, getAllUsers, updateUser, deleteMe, deleteUser };

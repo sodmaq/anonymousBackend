@@ -45,6 +45,13 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    deleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+    },
     passwordResetToken: String,
     passwordResetExpires: Date,
   },
