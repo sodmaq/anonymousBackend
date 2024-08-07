@@ -8,11 +8,13 @@ const { sendEmail } = require("../utils/email");
 const jwt = require("jsonwebtoken");
 const promisify = require("util").promisify;
 const crypto = require("crypto");
+const { v4: uuidv4 } = require("uuid");
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {
   const { name, email, password, confirmPassword, role } = req.body;
-
+  // generate anonymous link
+  const anonymousLink = uuidv4();
   // Validate input
   if (!name || !email || !password || !confirmPassword || !role) {
     return next(
@@ -34,6 +36,7 @@ const signUP = catchAsync(async (req, res, next) => {
     email,
     password,
     confirmPassword,
+    anonymousLink,
     role,
   });
   await newUser.save();

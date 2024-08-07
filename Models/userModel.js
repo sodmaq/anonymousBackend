@@ -37,6 +37,9 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    anonymousLink: {
+      type: String,
+    },
     emailVerified: {
       type: Boolean,
       default: false,
