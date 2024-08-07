@@ -20,9 +20,6 @@ const sendMessage = catchAsync(async (req, res, next) => {
     return next(new AppError("User not found", 404));
   }
 
-  console.log("Sender ID:", sender);
-  console.log("Recipient ID:", recipient._id);
-
   // Create the message with recipient's _id
   const message = await Message.create({
     sender,
