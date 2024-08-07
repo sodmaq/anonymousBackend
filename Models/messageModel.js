@@ -14,7 +14,7 @@ const messageSchema = new mongoose.Schema(
     },
     content: { type: String, required: true },
     type: { type: String, enum: ["text", "image", "video"], default: "text" },
-    isRead: { type: Boolean, default: false },
+    // isRead: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
