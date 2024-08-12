@@ -3,8 +3,12 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../Models/userModel");
 
+// Import the users object
+const users = require("../userSocketMap");
+
 const sendMessage = catchAsync(async (req, res, next) => {
   const { recipientLink, content, type } = req.body;
+
   // Validate input
   if (!recipientLink || !content || !type) {
     return next(
@@ -23,10 +27,19 @@ const sendMessage = catchAsync(async (req, res, next) => {
   // Create the message with recipient's _id
   const message = await Message.create({
     sender,
-    recipient: recipient._id, // Use recipient's _id
+    recipient: recipient._id,
     content,
     type,
   });
+
+  // Access io instance
+  const io = req.app.get("io");
+
+  // Assuming you have a mapping of user IDs to socket IDs
+  const recipientSocketId = users[recipient._id];
+  if (recipientSocketId) {
+    io.to(recipientSocketId).emit("receive_message", message);
+  }
 
   res.status(201).json({
     status: "success",
