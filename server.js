@@ -3,10 +3,10 @@ const process = require("process");
 const mongoose = require("mongoose");
 const socket = require("socket.io");
 const http = require("http");
-const Message = require("./Models/messageModel");
-
 // Import the users object
 const users = require("./userSocketMap");
+const Message = require("./Models/messageModel");
+const User = require("./Models/userModel");
 
 // Load environment variables from .env file
 dotenv.config({ path: "./config.env" });
@@ -51,7 +51,7 @@ app.set("io", io);
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // When a user registers their ID (e.g., after login)
+  // When a user registers their ID
   socket.on("register", (payload) => {
     console.log("received register", payload);
     const userId = payload.data;
@@ -61,18 +61,37 @@ io.on("connection", (socket) => {
 
   // When a user sends a message
   socket.on("send_message", async (data) => {
+    const { recipientLink, content, type } = data.data;
+    const sender = data.sender;
+
+    // Find the recipient
+    const recipient = await User.findOne({ anonymousLink: recipientLink });
+
+    if (!recipient) {
+      console.log("Recipient not found");
+      return;
+    }
+
     // Save the message to the database
     const message = await Message.create({
-      sender: data.senderId,
-      recipient: data.recipientId,
-      content: data.content,
-      type: data.type,
+      sender,
+      recipient: recipient._id,
+      content,
+      type,
     });
 
+    // Log message sent
+    console.log(`Message sent from ${sender} to ${recipient._id}: ${content}`);
+
     // Emit the message to the recipient if they're connected
-    const recipientSocketId = users[data.recipientId];
+    const recipientSocketId = users[recipient._id];
     if (recipientSocketId) {
       io.to(recipientSocketId).emit("receive_message", message);
+      // Log that the message was received by the recipient
+      console.log(`Message delivered to ${recipient._id}`);
+    } else {
+      // Log that the recipient is not online
+      console.log(`Recipient ${recipient._id} is not online`);
     }
   });
 
