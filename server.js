@@ -37,6 +37,9 @@ mongoose
 
 const app = require("./index");
 const server = http.createServer(app);
+app.get("/", (req, res) => {
+  res.status(204).send(); // No content, but no 404 either
+});
 
 const io = socket(server, {
   cors: {
