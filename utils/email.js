@@ -24,6 +24,7 @@ const sendEmail = async (toEmail, name, html) => {
     await mailerSend.email.send(emailParams);
   } catch (error) {
     throw new Error("Error sending email");
+    console.log(error);
   }
 };
 
