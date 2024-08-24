@@ -42,9 +42,11 @@ const sendErrorDev = (err, req, res) => {
   } else {
     // Rendered Website
     console.error("Error", err);
-    res.status(err.statusCode).render("error", {
+    res.status(err.statusCode).json({
       title: "Something went wrong",
       msg: err.message,
+      stack: err.stack,
+      error: err,
     });
   }
 };
@@ -68,15 +70,17 @@ const sendErrorProd = (err, req, res) => {
   } else {
     // Rendered website
     if (err.isOperational) {
-      return res.status(err.statusCode).render("error", {
+      return res.status(err.statusCode).json({
         title: "Something went wrong",
         msg: err.message,
+        stack: err.stack,
       });
     } else {
       console.error("Error", err);
-      return res.status(err.statusCode).render("error", {
+      return res.status(err.statusCode).json({
         title: "Something went wrong",
-        msg: "Please try again later!",
+        msg: "Please try again later",
+        stack: err.stack,
       });
     }
   }
