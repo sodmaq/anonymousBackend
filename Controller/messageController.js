@@ -46,7 +46,7 @@ const getMessages = catchAsync(async (req, res, next) => {
   }
 
   res.status(200).json({
-    status: "success",
+    status: "successs",
     data: {
       length: messages.length,
       messages,
