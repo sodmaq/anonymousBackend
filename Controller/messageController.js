@@ -4,17 +4,17 @@ const AppError = require("../utils/appError");
 const User = require("../Models/userModel");
 
 const sendMessage = catchAsync(async (req, res, next) => {
-  const { recipientLink, content, type } = req.body;
+  const { recipientLink, content } = req.body;
 
   // Validate input
-  if (!recipientLink || !content || !type) {
+  if (!recipientLink || !content) {
     return next(
       new AppError("Please provide recipientLink, content, and type", 400)
     );
   }
 
   // Check if recipient exists
-  const sender = req.user._id;
+  // const sender = req.user._id;
   const recipient = await User.findOne({ anonymousLink: recipientLink });
 
   if (!recipient) {
@@ -22,11 +22,11 @@ const sendMessage = catchAsync(async (req, res, next) => {
   }
 
   // Create the message with recipient's _id
+
   const message = await Message.create({
-    sender,
+    // sender,
     recipient: recipient._id,
     content,
-    type,
   });
 
   res.status(201).json({
