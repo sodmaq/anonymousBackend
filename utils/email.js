@@ -1,31 +1,31 @@
-require("dotenv").config();
-const { MailerSend, EmailParams, Sender, Recipient } = require("mailersend");
+const nodemailer = require("nodemailer");
 
-const mailerSend = new MailerSend({
-  apiKey: process.env.API_KEY,
-});
-
-const sendEmail = async (toEmail, name, html) => {
+const sendEmail = async (options) => {
   try {
-    const sentFrom = new Sender(
-      "test@trial-3yxj6lje78xgdo2r.mlsender.net",
-      "Gossip_Me"
-    );
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD,
+      },
+    });
 
-    const recipients = [new Recipient(toEmail, name)];
+    const mailOptions = {
+      from: "WhisperZone <yekeen244@gmail.com>",
+      to: options.email,
+      subject: options.subject,
+      text: options.message,
+      html: options.html,
+    };
 
-    const emailParams = new EmailParams()
-      .setFrom(sentFrom)
-      .setTo(recipients)
-      .setReplyTo(sentFrom)
-      .setSubject("Welcome to Gossip_Me!")
-      .setHtml(html);
-
-    await mailerSend.email.send(emailParams);
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent to ${options.email}`);
   } catch (error) {
-    throw new Error("Error sending email");
-    console.log(error);
+    console.error(`Error sending email to ${options.email}:`, error.message);
+    throw new Error("Email could not be sent.");
   }
 };
 
-module.exports = { sendEmail };
+module.exports = sendEmail;

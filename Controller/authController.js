@@ -4,7 +4,7 @@ const generateRefreshToken = require("../config/refreshToken");
 const { calculateExpirationTime } = require("../config/jwtToken");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const { sendEmail } = require("../utils/email");
+const sendEmail = require("../utils/email");
 const jwt = require("jsonwebtoken");
 const promisify = require("util").promisify;
 const crypto = require("crypto");
@@ -57,7 +57,7 @@ const signUP = catchAsync(async (req, res, next) => {
         <html>
           <body>
             <p>Hi ${name},</p>
-            <p>Welcome to <strong>Gossip_Me</strong>! 🎉</p>
+            <p>Welcome to <strong>whisperZone</strong>! 🎉</p>
             <p>We’re excited to have you on board. Please verify your email address by clicking the link below:</p>
             <p><a href="${verificationURL}">Verify your email</a></p>
             <p>If you have any questions or need assistance, feel free to reach out to us.</p>
@@ -65,8 +65,15 @@ const signUP = catchAsync(async (req, res, next) => {
             <p>Best regards,<br>The Gossip_Me Team</p>
           </body>
         </html>`;
-    await sendEmail(email, name, html);
-  } catch (error) {}
+    await sendEmail({
+      email: email,
+      subject: "Verify your email",
+      html: html,
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new AppError("Email could not be sent", 500));
+  }
 
   // Respond to client
   res.json({ message: "User created successfully", newUser });
@@ -169,8 +176,24 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     const resetURL = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/users/resetPassword/${resetToken}`;
-    const message = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetURL}.\nIf you did not forget your password, please ignore this email.`;
-    await sendEmail(user.email, "Gossip Me Password Reset", message);
+
+    // const message = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetURL}.\nIf you did not forget your password, please ignore this email.`;
+    const html = `
+    <html>
+      <body>
+        <p>Hi ${user.name},</p>
+        <p>It looks like you requested a password reset. No worries, we've got you covered!</p>
+        <p>Please reset your password by clicking the link below:</p>
+        <p><a href="${resetURL}">Reset your password</a></p>
+        <p>If you did not request this, please ignore this email. Your account remains secure.</p>
+        <p>Best regards,<br>The Gossip_Me Team</p>
+      </body>
+    </html>`;
+    await sendEmail({
+      email: user.email,
+      subject: "Your password reset token (valid for 10 minutes)",
+      html: html,
+    });
     res.status(200).json({
       status: "success",
       message: "Token sent to email",
