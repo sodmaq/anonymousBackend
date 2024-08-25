@@ -36,17 +36,38 @@ const sendMessage = catchAsync(async (req, res, next) => {
     },
   });
 });
-
 const getMessages = catchAsync(async (req, res, next) => {
   const recipient = req.user._id;
-  const messages = await Message.find({ recipient }).select("-sender");
 
+  // Create the initial query, filtering messages by recipient
+  let query = Message.find({ recipient });
+
+  // Pagination logic
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  query = query.skip(skip).limit(limit);
+
+  // If the page number is provided, check if it exists
+  if (req.query.page) {
+    const numMessages = await Message.countDocuments({ recipient });
+    if (skip >= numMessages) {
+      return next(new AppError("This page does not exist", 404));
+    }
+  }
+
+  // Execute the query
+  const messages = await query;
+
+  // Check if any messages were found
   if (messages.length === 0) {
     return next(new AppError("No messages found", 404));
   }
 
+  // Respond with the messages
   res.status(200).json({
-    status: "successs",
+    status: "success",
     data: {
       length: messages.length,
       messages,
