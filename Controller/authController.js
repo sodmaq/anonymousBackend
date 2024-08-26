@@ -252,6 +252,7 @@ const googleCallback = catchAsync(async (req, res, next) => {
   // Check if the authorization code is provided
   if (!code) {
     return next(new AppError("No code provided", 400)); // If no code, respond with an error
+    console.log("no code provided");
   }
 
   // Construct the URL for exchanging the authorization code for an access token
