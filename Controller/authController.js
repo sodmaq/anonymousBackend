@@ -9,6 +9,10 @@ const jwt = require("jsonwebtoken");
 const promisify = require("util").promisify;
 const crypto = require("crypto");
 const { v4: uuidv4 } = require("uuid");
+const axios = require("axios");
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = "http://localhost:8000/auth/google/callback";
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {
@@ -231,6 +235,75 @@ const resetPassword = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: "success", token });
 });
 
+// Initiates the Google Login flow
+const googleAuth = catchAsync(async (req, res, next) => {
+  // Construct the Google OAuth 2.0 authorization URL
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=profile email`;
+
+  // Redirect the user to the Google OAuth 2.0 authorization URL
+  res.redirect(url);
+});
+
+// Callback URL for handling the Google Login response
+const googleCallback = catchAsync(async (req, res, next) => {
+  // Extract the authorization code from the query parameters
+  const code = req.query.code;
+
+  // Check if the authorization code is provided
+  if (!code) {
+    return next(new AppError("No code provided", 400)); // If no code, respond with an error
+  }
+
+  // Construct the URL for exchanging the authorization code for an access token
+  const url = `https://oauth2.googleapis.com/token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${code}&redirect_uri=${REDIRECT_URI}&grant_type=authorization_code`;
+
+  // Exchange the authorization code for an access token and refresh token
+  const response = await axios.post(url);
+  const { access_token, refresh_token } = response.data;
+
+  // Check if both access token and refresh token are provided
+  if (!access_token || !refresh_token) {
+    return next(new AppError("No access token or refresh token provided", 400)); // If not, respond with an error
+  }
+
+  // Use the access token to fetch user profile information from Google
+  const googleUser = await axios.get(
+    "https://www.googleapis.com/oauth2/v1/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${access_token}`, // Include the access token in the request header
+      },
+    }
+  );
+
+  // Extract user email and name from the profile data
+  const { email, name } = googleUser.data;
+
+  // Check if the user already exists in the database
+  const user = await User.findOne({ email });
+
+  // If the user does not exist, create a new user record
+  if (!user) {
+    const newUser = await User.create({
+      name,
+      email,
+      anonymousLink: uuidv4(),
+    });
+
+    // Generate a JWT token for the new user
+    const token = generateToken(newUser._id);
+
+    // Respond with success status and the generated token
+    res.status(200).json({ status: "success", token });
+  } else {
+    // If the user already exists, generate a JWT token for the existing user
+    const token = generateToken(user._id);
+
+    // Respond with success status and the generated token
+    res.status(200).json({ status: "success", token });
+  }
+});
+
 module.exports = {
   signUP,
   login,
@@ -239,4 +312,6 @@ module.exports = {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  googleAuth,
+  googleCallback,
 };

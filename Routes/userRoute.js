@@ -5,6 +5,8 @@ const userController = require("../Controller/userController");
 const middleware = require("../middlewares/authMiddleware");
 
 router.post("/signup", authController.signUP);
+router.get("/auth/google", authController.googleAuth);
+router.get("/auth/google/callback", authController.googleCallback);
 router.post("/login", authController.login);
 router.post(
   "/handleRefreshToken",
