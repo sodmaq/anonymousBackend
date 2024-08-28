@@ -43,6 +43,7 @@ const updateUser = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
+  if (!user) return next(new AppError("User not found", 404));
   res.status(200).json({
     status: "success",
 

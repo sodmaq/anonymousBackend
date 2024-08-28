@@ -65,6 +65,9 @@ const getMessages = catchAsync(async (req, res, next) => {
     return next(new AppError("No messages found", 404));
   }
 
+  //mark message as read
+  await Message.updateMany({ _id: { $in: messages } }, { isRead: true });
+
   // Respond with the messages
   res.status(200).json({
     status: "success",
