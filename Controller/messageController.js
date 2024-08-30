@@ -13,6 +13,16 @@ const sendMessage = catchAsync(async (req, res, next) => {
     );
   }
 
+  const sender = await User.findOne({ anonymousLink: recipientLink });
+
+  if (sender) {
+    return next(new AppError("You cannot send a message to yourself", 400));
+  }
+
+  if (senderLink === recipientLink) {
+    return next(new AppError("You cannot send a message to yourself", 400));
+  }
+
   // Check if recipient exists
   // const sender = req.user._id;
   const recipient = await User.findOne({ anonymousLink: recipientLink });
