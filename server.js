@@ -18,7 +18,6 @@ process.on("uncaughtException", (err) => {
 });
 
 const DB = process.env.DATABASE;
-console.log("database connection URL:", DB);
 
 mongoose
   .connect(DB, {
