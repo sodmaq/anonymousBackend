@@ -16,11 +16,11 @@ const REDIRECT_URI = "http://localhost:8000/auth/google/callback";
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {
-  const { name, email, password, confirmPassword, role } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
   // generate anonymous link
   const anonymousLink = uuidv4();
   // Validate input
-  if (!name || !email || !password || !confirmPassword || !role) {
+  if (!name || !email || !password || !confirmPassword) {
     return next(
       new AppError(
         "Please provide name, email, password, and confirmPassword",
@@ -41,7 +41,6 @@ const signUP = catchAsync(async (req, res, next) => {
     password,
     confirmPassword,
     anonymousLink,
-    role,
   });
   await newUser.save();
   // create verification token

@@ -4,7 +4,7 @@ const middleware = require("../middlewares/authMiddleware");
 const messageController = require("../Controller/messageController");
 
 router.post(
-  "/sendMessage",
+  "/sendMessage/:recipientLink",
   //   middleware.protected,
   messageController.sendMessage
 );
