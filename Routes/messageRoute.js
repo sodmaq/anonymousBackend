@@ -5,7 +5,7 @@ const messageController = require("../Controller/messageController");
 
 router.post(
   "/sendMessage/:recipientLink",
-  //   middleware.protected,
+  //   middleware.protecte,
   messageController.sendMessage
 );
 
