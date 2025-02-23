@@ -19,6 +19,7 @@ router.patch(
   authController.updatePassword
 );
 router.get("/verifyEmail/:token", authController.verifyEmail);
+router.post("/resendVerificationEmail", authController.resendVerificationEmail);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 

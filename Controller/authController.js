@@ -49,7 +49,7 @@ const signUP = catchAsync(async (req, res, next) => {
     { id: newUser._id },
     process.env.JWT_VERIFICATION_TOKEN_SECRET,
     {
-      expiresIn: "7d",
+      expiresIn: "1d",
     }
   );
 
@@ -80,6 +80,50 @@ const signUP = catchAsync(async (req, res, next) => {
 
   // Respond to client
   res.json({ message: "User created successfully", newUser });
+});
+
+const resendVerificationEmail = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+  const verificationToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_VERIFICATION_TOKEN_SECRET,
+    {
+      expiresIn: "1d",
+    }
+  );
+  const verificationURL = `${frontendUrl}/verify-email/${verificationToken}`;
+  try {
+    const html = `
+       <html>
+  <body>
+    <p>Hi ${user.name},</p>
+    <p>Welcome to <strong>WhisperZone</strong>! 🎉</p>
+    <p>We’re excited to have you on board. Please verify your email address by clicking the button below:</p>
+    <p>
+      <a href="${verificationURL}" style="display: inline-block; background-color: #080da2; color: white; text-align: center; padding: 14px 20px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
+        Verify Your Email
+      </a>
+    </p>
+    <p>If you have any questions or need assistance, feel free to reach out to us.</p>
+    <p>Thank you for joining us!</p>
+    <p>Best regards,<br>WhisperZone Team</p>
+  </body>
+</html>
+      `;
+    await sendEmail({
+      email: user.email,
+      subject: "Verify your email",
+      html: html,
+    });
+  } catch (error) {
+    console.log(error);
+    return next(new AppError("Email could not be sent", 500));
+  }
+  res.json({ message: "Verification email sent successfully" });
 });
 //login endpoint
 const login = catchAsync(async (req, res, next) => {
@@ -184,15 +228,21 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     // const message = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetURL}.\nIf you did not forget your password, please ignore this email.`;
     const html = `
     <html>
-      <body>
-        <p>Hi ${user.name},</p>
-        <p>It looks like you requested a password reset. No worries, we've got you covered!</p>
-        <p>Please reset your password by clicking the link below:</p>
-        <p><a href="${resetURL}">Reset your password</a></p>
-        <p>If you did not request this, please ignore this email. Your account remains secure.</p>
-        <p>Best regards,<br>The Gossip_Me Team</p>
-      </body>
-    </html>`;
+  <body>
+    <p>Hi ${user.name},</p>
+    <p>Welcome to <strong>WhisperZone</strong>! 🎉</p>
+    <p>We’re excited to have you on board. Please verify your email address by clicking the button below:</p>
+    <p>
+      <a href="${verificationURL}" style="display: inline-block; background-color: #080da2; color: white; text-align: center; padding: 14px 20px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
+        Verify Your Email
+      </a>
+    </p>
+    <p>If you have any questions or need assistance, feel free to reach out to us.</p>
+    <p>Thank you for joining us!</p>
+    <p>Best regards,<br>WhisperZone Team</p>
+  </body>
+</html>
+    `;
     await sendEmail({
       email: user.email,
       subject: "Your password reset token (valid for 10 minutes)",
@@ -310,6 +360,7 @@ module.exports = {
   handleRefreshToken,
   updatePassword,
   verifyEmail,
+  resendVerificationEmail,
   forgotPassword,
   resetPassword,
   googleAuth,
