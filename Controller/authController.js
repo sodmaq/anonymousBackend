@@ -13,7 +13,7 @@ const axios = require("axios");
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = "http://localhost:8000/auth/google/callback";
-const frontendUrl = "http://localhost:5173";
+const frontendUrl = "https://anonymous-rust.vercel.app";
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {
