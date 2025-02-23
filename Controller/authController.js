@@ -57,17 +57,22 @@ const signUP = catchAsync(async (req, res, next) => {
   // Send welcome email
   try {
     const html = `
-        <html>
-          <body>
-            <p>Hi ${name},</p>
-            <p>Welcome to <strong>whisperZone</strong>! 🎉</p>
-            <p>We’re excited to have you on board. Please verify your email address by clicking the link below:</p>
-            <p><a href="${verificationURL}">Verify your email</a></p>
-            <p>If you have any questions or need assistance, feel free to reach out to us.</p>
-            <p>Thank you for joining us!</p>
-            <p>Best regards,<br>The Gossip_Me Team</p>
-          </body>
-        </html>`;
+       <html>
+  <body>
+    <p>Hi ${newUser.name},</p>
+    <p>Welcome to <strong>WhisperZone</strong>! 🎉</p>
+    <p>We’re excited to have you on board. Please verify your email address by clicking the button below:</p>
+    <p>
+      <a href="${verificationURL}" style="display: inline-block; background-color: #080da2; color: white; text-align: center; padding: 14px 20px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
+        Verify Your Email
+      </a>
+    </p>
+    <p>If you have any questions or need assistance, feel free to reach out to us.</p>
+    <p>Thank you for joining us!</p>
+    <p>Best regards,<br>WhisperZone Team</p>
+  </body>
+</html>
+      `;
     await sendEmail({
       email: email,
       subject: "Verify your email",
@@ -104,7 +109,7 @@ const resendVerificationEmail = catchAsync(async (req, res, next) => {
     <p>Welcome to <strong>WhisperZone</strong>! 🎉</p>
     <p>We’re excited to have you on board. Please verify your email address by clicking the button below:</p>
     <p>
-      <a href="${verificationURL}" style="display: inline-block; background-color: #080da2; color: white; text-align: center; padding: 14px 20px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
+      <a href="${verificationURL}" style="display: inline-block; background-color: #4CAF50; color: white; text-align: center; padding: 14px 20px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
         Verify Your Email
       </a>
     </p>
@@ -228,21 +233,15 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     // const message = `Forgot your password? Submit a PATCH request with your new password and confirmPassword to: ${resetURL}.\nIf you did not forget your password, please ignore this email.`;
     const html = `
     <html>
-  <body>
-    <p>Hi ${user.name},</p>
-    <p>Welcome to <strong>WhisperZone</strong>! 🎉</p>
-    <p>We’re excited to have you on board. Please verify your email address by clicking the button below:</p>
-    <p>
-      <a href="${verificationURL}" style="display: inline-block; background-color: #080da2; color: white; text-align: center; padding: 14px 20px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: bold;">
-        Verify Your Email
-      </a>
-    </p>
-    <p>If you have any questions or need assistance, feel free to reach out to us.</p>
-    <p>Thank you for joining us!</p>
-    <p>Best regards,<br>WhisperZone Team</p>
-  </body>
-</html>
-    `;
+      <body>
+        <p>Hi ${user.name},</p>
+        <p>It looks like you requested a password reset. No worries, we've got you covered!</p>
+        <p>Please reset your password by clicking the link below:</p>
+        <p><a href="${resetURL}">Reset your password</a></p>
+        <p>If you did not request this, please ignore this email. Your account remains secure.</p>
+        <p>Best regards,<br>whisperZone Team</p>
+      </body>
+    </html>`;
     await sendEmail({
       email: user.email,
       subject: "Your password reset token (valid for 10 minutes)",
