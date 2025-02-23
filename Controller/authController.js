@@ -97,6 +97,7 @@ const login = catchAsync(async (req, res, next) => {
   if (!findUser.emailVerified) {
     return next(new AppError("Please verify your email", 401));
   }
+  findUser.password = undefined;
   const refreshToken = generateRefreshToken(findUser._id);
   const expirationTime = calculateExpirationTime();
   res.status(200).json({
