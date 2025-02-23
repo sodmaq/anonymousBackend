@@ -13,6 +13,7 @@ const axios = require("axios");
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = "http://localhost:8000/auth/google/callback";
+const frontendUrl = "http://localhost:5173";
 
 // sign up endpoint
 const signUP = catchAsync(async (req, res, next) => {
@@ -51,9 +52,8 @@ const signUP = catchAsync(async (req, res, next) => {
       expiresIn: "7d",
     }
   );
-  const verificationURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/verifyEmail/${verificationToken}`;
+
+  const verificationURL = `${frontendUrl}/verify-email/${verificationToken}`;
   // Send welcome email
   try {
     const html = `
