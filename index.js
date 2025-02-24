@@ -10,7 +10,7 @@ const app = express();
 
 const corsOptions = {
   origin: ["http://localhost:5173", "https://anonymous-rust.vercel.app"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
