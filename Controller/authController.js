@@ -275,7 +275,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
   user.password = req.body.password;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
-  await user.save();
+  await user.save({ validateBeforeSave: false });
   const token = generateToken(user._id);
   res.status(200).json({ status: "success", token });
 });
