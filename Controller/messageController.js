@@ -73,7 +73,7 @@ const getMessages = catchAsync(async (req, res, next) => {
 });
 
 const deleteMessage = catchAsync(async (req, res, next) => {
-  const message = await Message.findById(req.params.id);
+  const message = await Message.findById(req.params.messageId);
   if (!message) {
     return next(new AppError("Message not found", 404));
   }
