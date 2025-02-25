@@ -10,5 +10,10 @@ router.post(
 );
 
 router.get("/getMessages", middleware.protected, messageController.getMessages);
+router.delete(
+  "/deleteMessage/:messageId",
+  middleware.protected,
+  messageController.deleteMessage
+);
 
 module.exports = router;

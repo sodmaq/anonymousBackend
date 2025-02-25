@@ -72,4 +72,16 @@ const getMessages = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getMessages, sendMessage };
+const deleteMessage = catchAsync(async (req, res, next) => {
+  const message = await Message.findById(req.params.id);
+  if (!message) {
+    return next(new AppError("Message not found", 404));
+  }
+  await message.remove();
+  res.status(200).json({
+    status: "success",
+    message: "Message deleted successfully",
+  });
+});
+
+module.exports = { getMessages, sendMessage, deleteMessage };
