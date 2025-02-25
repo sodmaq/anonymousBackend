@@ -77,7 +77,7 @@ const deleteMessage = catchAsync(async (req, res, next) => {
   if (!message) {
     return next(new AppError("Message not found", 404));
   }
-  await message.remove();
+  await message.deleteOne();
   res.status(200).json({
     status: "success",
     message: "Message deleted successfully",
