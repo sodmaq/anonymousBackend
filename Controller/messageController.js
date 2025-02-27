@@ -37,7 +37,7 @@ const getMessages = catchAsync(async (req, res, next) => {
   const recipient = req.user._id;
 
   // Create the initial query, filtering messages by recipient
-  let query = Message.find({ recipient });
+  let query = Message.find({ recipient }).sort({ createdAt: -1 });
 
   // Pagination logic
   const page = parseInt(req.query.page) || 1;
