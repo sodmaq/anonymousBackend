@@ -22,6 +22,10 @@ app.use(morgan("dev"));
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/messages", messageRoute);
 
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "API is running fine!" });
+});
+
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
