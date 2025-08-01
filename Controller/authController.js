@@ -79,7 +79,6 @@ const signUP = catchAsync(async (req, res, next) => {
       html: html,
     });
   } catch (error) {
-    console.log(error);
     return next(new AppError("Email could not be sent", 500));
   }
 
@@ -125,7 +124,6 @@ const resendVerificationEmail = catchAsync(async (req, res, next) => {
       html: html,
     });
   } catch (error) {
-    console.log(error);
     return next(new AppError("Email could not be sent", 500));
   }
   res.json({ message: "Verification email sent successfully" });

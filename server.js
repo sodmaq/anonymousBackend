@@ -13,7 +13,6 @@ dotenv.config({ path: "./config.env" });
 
 process.on("uncaughtException", (err) => {
   console.log("Unhandled exception shutting down");
-  console.log(err.name, err.message);
   process.exit(1);
 });
 
@@ -28,7 +27,6 @@ mongoose
     console.log("DB connection successful!");
   })
   .catch((err) => {
-    console.log("DB connection error:", err);
     process.exit(1);
   });
 
@@ -49,14 +47,11 @@ const io = socket(server, {
 app.set("io", io);
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
-
   // When a user registers their ID
   socket.on("register", (payload) => {
     console.log("received register", payload);
     const userId = payload.data;
     users[userId] = socket.id; // Store the mapping
-    console.log(`User ${userId} is registered with socket ID ${socket.id}`);
   });
 
   // When a user sends a message

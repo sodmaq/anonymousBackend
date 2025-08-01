@@ -9,6 +9,11 @@ const axios = require("axios");
 const askQuestion = catchAsync(async (req, res, next) => {
   const { question } = req.body;
 
+  // Validate question
+  if (!question || typeof question !== "string") {
+    return next(new AppError("Question must be a valid string", 400));
+  }
+
   try {
     const response = await fetch("https://api.cohere.ai/v1/generate", {
       method: "POST",
@@ -18,9 +23,10 @@ const askQuestion = catchAsync(async (req, res, next) => {
       },
       body: JSON.stringify({
         model: "command-light",
-        prompt: question,
-        max_tokens: 100,
-        temperature: 0.7,
+        prompt: question, // This should be a STRING, not an object
+        max_tokens: 150,
+        temperature: 0.8,
+        stop_sequences: ["\n\n"], // Stop at double newline for cleaner responses
       }),
     });
 
@@ -32,6 +38,7 @@ const askQuestion = catchAsync(async (req, res, next) => {
       );
     }
 
+    // Extract the generated text
     const answer = data.generations[0].text.trim();
 
     res.status(200).json({
@@ -41,7 +48,6 @@ const askQuestion = catchAsync(async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.log("Error:", error);
     return next(new AppError("Failed to generate response", 500));
   }
 });
