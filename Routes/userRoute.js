@@ -4,6 +4,8 @@ const authController = require("../Controller/authController");
 const userController = require("../Controller/userController");
 const middleware = require("../middlewares/authMiddleware");
 
+router.post("/askQuestion", userController.askQuestion);
+
 router.post("/signup", authController.signUP);
 router.get("/auth/google", authController.googleAuth);
 router.get("/auth/google/callback", authController.googleCallback);

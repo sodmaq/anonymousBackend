@@ -3,6 +3,48 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 const crypto = require("crypto");
+const axios = require("axios");
+
+//ask question
+const askQuestion = catchAsync(async (req, res, next) => {
+  const { question } = req.body;
+
+  try {
+    const response = await fetch("https://api.cohere.ai/v1/generate", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "command-light",
+        prompt: question,
+        max_tokens: 100,
+        temperature: 0.7,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return next(
+        new AppError(`Cohere API error: ${data.message}`, response.status)
+      );
+    }
+
+    const answer = data.generations[0].text.trim();
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        response: answer,
+      },
+    });
+  } catch (error) {
+    console.log("Error:", error);
+    return next(new AppError("Failed to generate response", 500));
+  }
+});
 
 // get A user
 const getUser = catchAsync(async (req, res, next) => {
@@ -87,4 +129,11 @@ const deleteUser = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getUser, getAllUsers, updateUser, deleteMe, deleteUser };
+module.exports = {
+  getUser,
+  getAllUsers,
+  updateUser,
+  deleteMe,
+  deleteUser,
+  askQuestion,
+};
